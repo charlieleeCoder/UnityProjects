@@ -27,11 +27,15 @@ public class PlayerBehaviour : MonoBehaviour
     
     private bool _isShooting;
 
+    // Game
+    private GameBehaviour _gameManager;
+
     // Start is called before the first frame update
     void Start()
     {
         _rigidBody = GetComponent<Rigidbody>();
         _capsuleCollider = GetComponent<CapsuleCollider>();
+        _gameManager = GameObject.Find("Game_Manager").GetComponent<GameBehaviour>();
     }
 
     // Update is called once per frame
@@ -96,5 +100,14 @@ public class PlayerBehaviour : MonoBehaviour
             distanceToGroundBuffer, groundLayer, QueryTriggerInteraction.Ignore);
 
         return grounded;
+    }
+
+    // Collision
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.name == "Enemy01")
+        {
+            _gameManager.HP -= 1;
+        }
     }
 }

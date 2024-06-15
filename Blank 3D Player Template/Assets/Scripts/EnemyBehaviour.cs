@@ -9,6 +9,7 @@ public class EnemyBehaviour : MonoBehaviour
     public Transform patrolRoute;
     public List<Transform> locations;
 
+    // Private nav
     private int _locationIndex = 0;
     private NavMeshAgent _agent;
     private bool _patrolling = true;
@@ -20,9 +21,8 @@ public class EnemyBehaviour : MonoBehaviour
     void Start()
     {
         _agent = GetComponent<NavMeshAgent>();
-
+        playerLocation = GameObject.Find("Player").transform;
         InitialisePatrolRoute();
-
         MoveToNextPatrolLocation();
     }
 
@@ -49,7 +49,17 @@ public class EnemyBehaviour : MonoBehaviour
     // Swap location
     void MoveToNextPatrolLocation()
     {
+        // Do nothing
+        if (locations.Count == 0) 
+        {
+            return;
+        }
+
+        // Next location
         _agent.destination = locations[_locationIndex].position;
+
+        // Increment index and loop
+        _locationIndex = (_locationIndex + 1) % locations.Count;
     }
 
     // When in larger trigger collider range
@@ -57,9 +67,12 @@ public class EnemyBehaviour : MonoBehaviour
     {
         if(other.name == "Player")
         {
-            // Now attacking
+            // Stop patrol
             _patrolling = false;
+
+            // Now attacking
             Debug.Log("Player detected - attack!");
+            _agent.destination = playerLocation.position;
         }
     }
 
@@ -71,6 +84,35 @@ public class EnemyBehaviour : MonoBehaviour
             // Now attacking
             _patrolling = true;
             Debug.Log("Player lost - back to patrol...");
+        }
+    }
+
+    // Health & death
+    private int _lives;
+    public int enemyLives
+    {
+        get { return _lives; }
+
+        private set 
+        { 
+            _lives = value; 
+            
+            if (_lives <= 0)
+            {
+                Destroy(this.gameObject);
+                Debug.Log("This cruel world...");
+            }
+        
+        } 
+    }
+
+    // Remove health
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.name == "Bullet(Clone)")
+        {
+            enemyLives -= 1;
+            Debug.Log("Hit!");
         }
     }
 }

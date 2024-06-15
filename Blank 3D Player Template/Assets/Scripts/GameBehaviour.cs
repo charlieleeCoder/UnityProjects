@@ -15,13 +15,16 @@ public class GameBehaviour : MonoBehaviour
     public TMP_Text healthText;
     public TMP_Text itemText;
 
+    // Player
     private int _playerHP = 10;
     private int _itemsCollected = 0;
     public int _maxItems = 3;
 
     // Trigger state machine
     public Button winButton;
+    public Button lossButton;
 
+    // Health
     public int HP
     {
         get { return _playerHP; }
@@ -31,10 +34,25 @@ public class GameBehaviour : MonoBehaviour
             Debug.LogFormat($"Lives: {_playerHP}");
 
             healthText.text = $"Health: {HP}";
-        
+
+            if (_playerHP <= 0)
+            {
+                Debug.Log("Game over...");
+                lossButton.gameObject.SetActive(true);
+                Time.timeScale = 0f;
+            }
+
+            else 
+            {
+                Debug.Log("Ow!");
+            }
+
         }
+
+
     }
 
+    // Register item pick-up
     public int Items
     {
         get { return _itemsCollected; }
@@ -45,6 +63,7 @@ public class GameBehaviour : MonoBehaviour
 
             itemText.text = $"Items: {Items}";
 
+            // Trigger win state
             if ( _itemsCollected >= _maxItems)
             {
                 winButton.gameObject.SetActive(true);
@@ -54,6 +73,7 @@ public class GameBehaviour : MonoBehaviour
 
     }
 
+    // On win button clicked
     public void RestartScene()
     {
         Debug.Log("Restart trigerred...");
